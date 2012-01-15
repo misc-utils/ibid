@@ -1,0 +1,22 @@
+#!/bin/bash
+
+quit()
+{
+    echo "Give urls as arguments"
+    exit 1
+}
+
+[ "$1" ] || quit
+
+for j in $@
+do
+    (
+    dir_name=$(echo "$j" | sed 's#.*/##' | sed 's/\..*//')
+    echo "creating dir $dir_name"
+    mkdir -p $dir_name
+    cd $dir_name
+    echo $j > url
+
+    aria2c -Z -j 20 $(lynx -dump -listonly $j | grep "/src/" | awk '{print $2}' | sort | uniq)
+    )
+done
